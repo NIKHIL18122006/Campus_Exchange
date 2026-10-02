@@ -26,3 +26,4 @@ export const env = {
     pass: process.env.SMTP_PASS,
   },
 };
+console.log('SMTP config:', env.smtp);
