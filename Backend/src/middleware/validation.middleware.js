@@ -9,6 +9,15 @@ export const validate = (schema) => (req, res, next) => {
   next();
 };
 
+export const validateQuery = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.query);
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.issues[0].message });
+  }
+  req.validated = result.data;
+  next();
+};
+
 const email = z.string().trim().toLowerCase().email('Enter a valid email address');
 
 export const signupSchema = z.object({
@@ -39,3 +48,17 @@ export const createListingSchema = z.object({
   category: z.enum(['books', 'electronics', 'furniture', 'stationery', 'cycles', 'other']),
   condition: z.enum(['new', 'like_new', 'used', 'heavily_used']),
 });
+
+export const browseListingsSchema = z
+  .object({
+    q: z.string().trim().max(100).optional(),
+    category: z.enum(['books', 'electronics', 'furniture', 'stationery', 'cycles', 'other']).optional(),
+    minPrice: z.coerce.number().int().min(0).optional(),
+    maxPrice: z.coerce.number().int().min(0).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+  })
+  .refine(
+    (v) => v.minPrice === undefined || v.maxPrice === undefined || v.minPrice <= v.maxPrice,
+    { message: 'minPrice cannot be greater than maxPrice' }
+  );
