@@ -30,3 +30,12 @@ export const verifyOtpSchema = z.object({
 export const resendOtpSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
 });
+
+export const createListingSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(120),
+  description: z.string().trim().max(2000).optional().default(''),
+  price: z.coerce.number().int('Price must be a whole number').min(0, 'Price cannot be negative'),
+  negotiable: z.enum(['true', 'false']).optional().default('false').transform((v) => v === 'true'),
+  category: z.enum(['books', 'electronics', 'furniture', 'stationery', 'cycles', 'other']),
+  condition: z.enum(['new', 'like_new', 'used', 'heavily_used']),
+});

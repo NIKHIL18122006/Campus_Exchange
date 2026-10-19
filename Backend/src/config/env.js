@@ -25,5 +25,10 @@ export const env = {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  cloudinary: {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  apiKey: process.env.CLOUDINARY_API_KEY,
+  apiSecret: process.env.CLOUDINARY_API_SECRET,
+},
 };
 console.log('SMTP config:', env.smtp);
