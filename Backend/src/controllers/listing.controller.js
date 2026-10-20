@@ -130,3 +130,42 @@ export async function getListing(req, res) {
     },
   });
 }
+
+export async function getMyListings(req,res){
+  const result = await query(
+    `SELECT l.id, l.title, l.price, l.negotiable, l.category, l.condition,
+            l.status, l.created_at,
+            (SELECT image_url FROM listing_images li
+              WHERE li.listing_id = l.id
+              ORDER BY li.position LIMIT 1) AS cover_image
+     FROM listings l
+     WHERE l.seller_id = $1
+     ORDER BY l.created_at DESC`,
+     [req.user.id]
+  );
+  res.status(200).json({
+    listings: result.rows
+  });
+}
+
+export async function updateListingStatus(req,res){
+  const result = await query(
+    `UPDATE listings SET status = $1 WHERE id = $2 AND seller_id = $3 RETURNING *`,
+    [req.body.status, req.params.id, req.user.id]
+  );
+  if (result.rows.length === 0) {
+    return res.status(404).json({ error: 'Listing not found' });
+  }
+  res.status(200).json({ listing: result.rows[0] });
+}
+
+export async function deleteListing(req,res){
+  const result = await query(
+    `DELETE FROM listings WHERE id = $1 AND seller_id = $2 RETURNING id`,
+    [req.params.id, req.user.id]
+  );
+  if (result.rows.length === 0) {
+    return res.status(404).json({ error: 'Listing not found' });
+  }
+  res.status(200).json({ message: 'Listing deleted successfully' });
+}

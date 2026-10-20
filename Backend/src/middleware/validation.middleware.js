@@ -62,3 +62,7 @@ export const browseListingsSchema = z
     (v) => v.minPrice === undefined || v.maxPrice === undefined || v.minPrice <= v.maxPrice,
     { message: 'minPrice cannot be greater than maxPrice' }
   );
+
+export const updateStatusSchema = z.object({
+  status: z.enum(['available', 'sold']),
+});
