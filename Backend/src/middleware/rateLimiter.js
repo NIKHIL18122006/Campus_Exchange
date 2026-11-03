@@ -7,3 +7,12 @@ export const rateLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many requests. Try again later.' },
 });
+
+export const messageLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,                              // 30 messages per minute per user
+  keyGenerator: (req) => req.user.id,     // per user, not per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'You are sending messages too fast. Slow down.' },
+});

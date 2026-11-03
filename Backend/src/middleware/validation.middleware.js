@@ -63,6 +63,10 @@ export const browseListingsSchema = z
     { message: 'minPrice cannot be greater than maxPrice' }
   );
 
+export const sendMessageSchema = z.object({
+  body: z.string().trim().min(1, 'Message cannot be empty').max(1000, 'Message is too long'),
+});
+
 export const updateStatusSchema = z.object({
   status: z.enum(['available', 'sold']),
 });

@@ -47,3 +47,24 @@ CREATE TABLE listing_images (
 
 CREATE INDEX idx_listings_status_created ON listings (status, created_at DESC);
 CREATE INDEX idx_listing_images_listing ON listing_images (listing_id, position);
+
+CREATE TABLE conversations (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  listing_id          UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  buyer_id            UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  buyer_last_read_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  seller_last_read_at TIMESTAMPTZ NOT NULL DEFAULT 'epoch',
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (listing_id, buyer_id)
+);
+
+CREATE TABLE messages (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  sender_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body            TEXT NOT NULL CHECK (char_length(body) BETWEEN 1 AND 1000),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_messages_conversation_created
+  ON messages (conversation_id, created_at);

@@ -5,11 +5,13 @@ import authRoutes from "./routes/auth.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { rateLimiter } from "./middleware/rateLimiter.js";
 import listingRoutes from "./routes/listing.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
 const app = express();
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 app.use("/api/auth", rateLimiter, authRoutes);
+app.use("/api/conversations", conversationRoutes);
 app.use('/api/listings', listingRoutes); 
 app.use(errorHandler);
 
