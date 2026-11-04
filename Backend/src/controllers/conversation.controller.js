@@ -1,4 +1,5 @@
 import { query, pool } from '../config/db.js';
+import { emitToUser } from '../socket/index.js';
 
 export async function expressInterest(req, res) {
   const listingResult = await query(
@@ -41,12 +42,21 @@ export async function expressInterest(req, res) {
 
     const conversationId = inserted.rows[0].id;
 
-    await client.query(
-      'INSERT INTO messages (conversation_id, sender_id, body) VALUES ($1, $2, $3)',
+    const messageResult = await client.query(
+      `INSERT INTO messages (conversation_id, sender_id, body)
+       VALUES ($1, $2, $3)
+       RETURNING id, sender_id, body, created_at`,
       [conversationId, req.user.id, `Hi, I'm interested in "${listing.title}".`]
     );
 
     await client.query('COMMIT');
+
+    emitToUser(listing.seller_id, 'message:new', {
+      conversationId,
+      isNew: true,
+      message: messageResult.rows[0],
+    });
+
     res.status(201).json({ conversationId, created: true });
   } catch (err) {
     await client.query('ROLLBACK');
@@ -170,6 +180,11 @@ export async function sendMessage(req, res) {
 
   await markRead(conv, req.user.id);   // replying means you've seen the chat
 
+  emitToUser(conv.other_id, 'message:new', {
+    conversationId: conv.id,
+    isNew: false,
+    message: result.rows[0],
+  });
   // Socket.io push to the other person is added in the next step
   res.status(201).json({ message: result.rows[0] });
 }
@@ -178,4 +193,14 @@ async function markRead(conv, userId) {
   // the column name comes from one of two fixed strings, never from user input
   const column = conv.buyer_id === userId ? 'buyer_last_read_at' : 'seller_last_read_at';
   await query(`UPDATE conversations SET ${column} = NOW() WHERE id = $1`, [conv.id]);
+}
+
+export async function markConversationRead(req, res) {
+  const conv = await getConversationForUser(req.params.id, req.user.id);
+  if (!conv) {
+    return res.status(404).json({ error: 'Conversation not found' });
+  }
+
+  await markRead(conv, req.user.id);
+  res.status(204).send();
 }

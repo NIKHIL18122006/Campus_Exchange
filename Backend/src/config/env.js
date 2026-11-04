@@ -30,5 +30,6 @@ export const env = {
   apiKey: process.env.CLOUDINARY_API_KEY,
   apiSecret: process.env.CLOUDINARY_API_SECRET,
 },
+clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
 };
 console.log('SMTP config:', env.smtp);
