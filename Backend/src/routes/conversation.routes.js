@@ -7,6 +7,7 @@ import {
   getUnreadCount,
   getMessages,
   sendMessage,
+  markConversationRead,
 } from '../controllers/conversation.controller.js';
 
 const router = Router();
