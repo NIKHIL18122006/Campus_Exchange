@@ -10,11 +10,11 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/', validateQuery(browseListingsSchema), browseListings);
-router.get('/:id', getListing);
 router.get('/mine', getMyListings);
 router.post('/', requireAuth, uploadImages, validate(createListingSchema), createListing);
 router.patch('/:id/status', validate(updateStatusSchema), updateListingStatus);
 router.delete('/:id', deleteListing);
+router.get('/:id', getListing);
 router.post('/:id/interest', expressInterest);
 
 

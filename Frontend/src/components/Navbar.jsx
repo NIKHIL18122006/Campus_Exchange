@@ -17,10 +17,10 @@ export default function Navbar() {
 
   return (
     <header className="bg-brand">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
-        <Link to="/" className="mr-2 text-lg font-semibold text-white">
-          Campus Exchange
-        </Link>
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
+  <Link to="/" className="mr-2 text-xl font-semibold text-white">
+    Campus Exchange
+  </Link>
 
         {user ? (
           <>
