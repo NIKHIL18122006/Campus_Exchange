@@ -32,4 +32,3 @@ export const env = {
 },
 clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
 };
-console.log('SMTP config:', env.smtp);

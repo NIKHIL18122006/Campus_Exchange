@@ -1,5 +1,8 @@
 import { query, pool } from '../config/db.js';
-import { uploadImage } from '../services/cloudinary.service.js';
+import { uploadImage, deleteImages } from '../services/cloudinary.service.js';
+import { emitToUser } from '../socket/index.js';
+
+
 
 export async function createListing(req, res) {
   const files = req.files || [];
@@ -36,6 +39,7 @@ export async function createListing(req, res) {
     res.status(201).json({ listing: { ...listing, images: imageUrls } });
   } catch (err) {
     await client.query('ROLLBACK');
+    deleteImages(imageUrls);
     throw err;
   } finally {
     client.release();
@@ -49,7 +53,7 @@ export async function browseListings(req, res) {
     const params = [];
 
     if(q){
-        const escaped = q.replace(/[%_]/g, '\\$&'); // Escape % and _ for LIKE
+        const escaped = q.replace(/[\\%_]/g, '\\$&'); // Escape % and _ for LIKE
         params.push(`%${escaped}%`);
         conditions.push(`(l.title ILIKE $${params.length} OR l.description ILIKE $${params.length})`);
     }
@@ -148,7 +152,7 @@ export async function getMyListings(req,res){
   });
 }
 
-export async function updateListingStatus(req,res){
+export async function updateListingStatus(req, res) {
   const result = await query(
     `UPDATE listings SET status = $1 WHERE id = $2 AND seller_id = $3 RETURNING *`,
     [req.body.status, req.params.id, req.user.id]
@@ -156,10 +160,35 @@ export async function updateListingStatus(req,res){
   if (result.rows.length === 0) {
     return res.status(404).json({ error: 'Listing not found' });
   }
-  res.status(200).json({ listing: result.rows[0] });
+
+  const updated = result.rows[0];
+
+  // tell the seller's other tabs and every buyer who has a chat about this item
+  const chats = await query(
+    'SELECT buyer_id FROM conversations WHERE listing_id = $1',
+    [updated.id]
+  );
+  const recipients = new Set([req.user.id, ...chats.rows.map((c) => c.buyer_id)]);
+  for (const userId of recipients) {
+    emitToUser(userId, 'listing:status', {
+      listingId: updated.id,
+      status: updated.status,
+    });
+  }
+
+  res.status(200).json({ listing: updated });
 }
 
-export async function deleteListing(req,res){
+export async function deleteListing(req, res) {
+  // grab the photo URLs first, because the rows disappear with the listing
+  const images = await query(
+    `SELECT li.image_url
+     FROM listing_images li
+     JOIN listings l ON l.id = li.listing_id
+     WHERE l.id = $1 AND l.seller_id = $2`,
+    [req.params.id, req.user.id]
+  );
+
   const result = await query(
     `DELETE FROM listings WHERE id = $1 AND seller_id = $2 RETURNING id`,
     [req.params.id, req.user.id]
@@ -167,5 +196,9 @@ export async function deleteListing(req,res){
   if (result.rows.length === 0) {
     return res.status(404).json({ error: 'Listing not found' });
   }
+
+  // after the database delete, and not awaited, so the seller doesn't wait for Cloudinary
+  deleteImages(images.rows.map((r) => r.image_url));
+
   res.status(200).json({ message: 'Listing deleted successfully' });
 }

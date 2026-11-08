@@ -14,9 +14,9 @@ export async function signup(req, res) {
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (!normalizedEmail.endsWith('@' + env.allowedDomain)) {
+  /* if (!normalizedEmail.endsWith('@' + env.allowedDomain)) {
     return res.status(400).json({ error: `Use your ${env.allowedDomain} email` });
-  }
+  }*/
 
   const existing = await query('SELECT id, is_verified FROM users WHERE email = $1', [normalizedEmail]);
 

@@ -1,16 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api, tokenStore, setUnauthorizedHandler } from '../api/client.js';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(tokenStore.get()));
 
   const logout = useCallback(() => {
-    tokenStore.clear();
-    setUser(null);
-  }, []);
+  tokenStore.clear();
+  setUser(null);
+  queryClient.clear();
+}, [queryClient]);
 
   const login = useCallback((token, nextUser) => {
     tokenStore.set(token);

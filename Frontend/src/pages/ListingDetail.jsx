@@ -1,17 +1,28 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getListing } from '../api/listings.js';
+import { expressInterest } from '../api/conversations.js';
 import { categoryLabel, conditionLabel, formatPrice, timeAgo } from '../lib/format.js';
+import Button from '../components/Button.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [active, setActive] = useState(0);
 
   const { data, isPending, error } = useQuery({
     queryKey: ['listing', id],
     queryFn: () => getListing(id),
+  });
+
+  const interest = useMutation({
+    mutationFn: () => expressInterest(id),
+    onSuccess: ({ conversationId }) => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      navigate(`/messages/${conversationId}`);
+    },
   });
 
   // go back to the filtered list if we came from it, otherwise to the home page
@@ -26,7 +37,9 @@ export default function ListingDetail() {
         <p role="alert" className="text-danger">
           {missing ? "We couldn't find that listing." : error.message}
         </p>
-        <Link to="/" className="mt-2 inline-block text-brand underline">Back to listings</Link>
+        <Link to="/" className="mt-2 inline-block text-brand underline">
+          Back to listings
+        </Link>
       </div>
     );
   }
@@ -98,11 +111,32 @@ export default function ListingDetail() {
             {listing.isOwner && (
               <p className="mt-5 border-t border-line pt-4 text-sm text-muted">
                 This is your listing. You can manage it under{' '}
-                <Link to="/my-listings" className="text-brand underline">My listings</Link>.
+                <Link to="/my-listings" className="text-brand underline">
+                  My listings
+                </Link>
+                .
               </p>
             )}
 
-            {/* Step 5: the "I'm interested" button for buyers goes here */}
+            {!listing.isOwner && listing.status === 'available' && (
+              <div className="mt-5 border-t border-line pt-4">
+                <Button
+                  className="w-full"
+                  onClick={() => interest.mutate()}
+                  disabled={interest.isPending}
+                >
+                  {interest.isPending ? 'Opening chat…' : "I'm interested"}
+                </Button>
+                <p className="mt-2 text-sm text-muted">
+                  This sends {listing.seller.name} a message and opens a chat.
+                </p>
+                {interest.error && (
+                  <p role="alert" className="mt-2 text-sm text-danger">
+                    {interest.error.message}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </aside>
       </div>

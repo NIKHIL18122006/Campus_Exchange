@@ -7,6 +7,11 @@ cloudinary.config({
   api_secret: env.cloudinary.apiSecret,
 });
 
+function publicIdFromUrl(url) {
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[A-Za-z0-9]+$/);
+  return match ? match[1] : null;
+}
+
 export function uploadImage(buffer) {
   return new Promise((resolve, reject) => {
     cloudinary.uploader
@@ -15,5 +20,15 @@ export function uploadImage(buffer) {
         resolve(result.secure_url);
       })
       .end(buffer);
+  });
+}
+
+export async function deleteImages(urls) {
+  const ids = urls.map(publicIdFromUrl).filter(Boolean);
+  if (ids.length === 0) return;
+
+  const results = await Promise.allSettled(ids.map((id) => cloudinary.uploader.destroy(id)));
+  results.forEach((r) => {
+    if (r.status === 'rejected') console.error('Cloudinary cleanup failed:', r.reason?.message);
   });
 }

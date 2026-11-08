@@ -9,6 +9,9 @@ import Home from './pages/Home.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
 import Sell from './pages/Sell.jsx';
 import MyListings from './pages/MyListings.jsx';
+import Messages from './pages/Messages.jsx';
+import Chat from './pages/Chat.jsx';
+import LiveUpdates from './components/LiveUpdates.jsx';
 
 function Shell({ children }) {
   return (
@@ -44,6 +47,8 @@ function FullWidthLayout() {
 
 export default function App() {
   return (
+    <>
+    <LiveUpdates />
     <Routes>
       <Route element={<FullWidthLayout />}>
         <Route element={<ProtectedRoute />}>
@@ -60,8 +65,11 @@ export default function App() {
           <Route path="/listings/:id" element={<ListingDetail />} />
           <Route path="/sell" element={<Sell />} />
           <Route path="/my-listings" element={<MyListings />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:id" element={<Chat />} />
         </Route>
       </Route>
     </Routes>
+    </>
   );
 }
