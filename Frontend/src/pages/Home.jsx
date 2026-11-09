@@ -5,10 +5,12 @@ import { browseListings } from '../api/listings.js';
 import ListingCard from '../components/ListingCard.jsx';
 import CategoryChips from '../components/CategoryChips.jsx';
 import PriceFilter from '../components/PriceFilter.jsx';
+import Container from '../components/Container.jsx';
 import Button from '../components/Button.jsx';
 
 const college = import.meta.env.VITE_COLLEGE_NAME;
-const gridClass = 'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4';
+const gridClass =
+  'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 2xl:grid-cols-6';
 
 export default function Home() {
   const [params, setParams] = useSearchParams();
@@ -57,35 +59,35 @@ export default function Home() {
   return (
     <>
       {/* Header band: continues the navbar colour */}
-      <section className="bg-brand pb-9 pt-3">
-        <div className="mx-auto max-w-6xl px-4">
-          <h1 className="text-3xl font-semibold text-white">
+      <section className="bg-brand pb-7 pt-2 sm:pb-9 sm:pt-3">
+        <Container>
+          <h1 className="text-2xl font-semibold text-white sm:text-3xl lg:text-4xl">
             Buy and sell with students at {college}
           </h1>
-          <p className="mt-1 max-w-xl text-white/80">
+          <p className="mt-1 max-w-2xl text-white/80">
             Textbooks, cycles, calculators and more, from people you can meet on campus.
           </p>
 
-          <form onSubmit={handleSearch} className="mt-5 flex max-w-2xl gap-2">
+          <form onSubmit={handleSearch} className="mt-5 flex max-w-4xl gap-2">
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               aria-label="Search listings"
               placeholder="Search for a textbook, cycle, calculator…"
-              className="flex-1 rounded bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-white/70"
+              className="min-w-0 flex-1 rounded bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-white/70"
             />
             <button
               type="submit"
-              className="rounded bg-ink px-6 py-3 font-semibold text-white hover:bg-black"
+              className="shrink-0 rounded bg-ink px-5 py-3 font-semibold text-white hover:bg-black sm:px-6"
             >
               Search
             </button>
           </form>
-        </div>
+        </Container>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 py-6">
+      <Container className="py-6">
         <CategoryChips value={filters.category} onChange={(category) => update({ category })} />
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
@@ -113,7 +115,7 @@ export default function Home() {
         <section className="mt-4">
           {isPending && (
             <div className={gridClass}>
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} className="h-72 animate-pulse rounded-md bg-line/60" />
               ))}
             </div>
@@ -169,7 +171,7 @@ export default function Home() {
             </>
           )}
         </section>
-      </div>
+      </Container>
     </>
   );
 }

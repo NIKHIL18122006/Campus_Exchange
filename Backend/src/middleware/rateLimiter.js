@@ -10,7 +10,7 @@ export const rateLimiter = rateLimit({
 
 export const messageLimiter = rateLimit({
   windowMs: 60 * 1000,
-  limit: 30,                              // 30 messages per minute per user
+  limit: 100,                              // 100 messages per minute per user
   keyGenerator: (req) => req.user.id,     // per user, not per IP
   standardHeaders: true,
   legacyHeaders: false,

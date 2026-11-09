@@ -7,7 +7,7 @@ export default function CategoryChips({ value, onChange }) {
     }`;
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
       <button onClick={() => onChange('')} aria-pressed={!value} className={chip(!value)}>
         All
       </button>

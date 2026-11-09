@@ -55,9 +55,9 @@ export default function VerifyOtp() {
     <div className="mx-auto max-w-sm">
       <h1 className="text-2xl font-semibold">Check your email</h1>
       <p className="mt-1 text-muted">
-        We sent a 6-digit code to <span className="font-medium text-ink">{state.email}</span>.
-        It expires in 10 minutes.
-      </p>
+  We sent a 6-digit code to <span className="font-medium text-ink">{state.email}</span>.
+  It expires in 10 minutes. If you can't find it, check your spam folder.
+</p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded border border-line bg-white p-5">
         <Field

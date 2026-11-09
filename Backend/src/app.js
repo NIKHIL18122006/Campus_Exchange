@@ -7,6 +7,7 @@ import { env } from "./config/env.js";
 import listingRoutes from "./routes/listing.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(cors({ origin: env.clientOrigin }));
 app.use(express.json());

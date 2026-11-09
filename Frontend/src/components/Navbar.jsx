@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getUnreadCount } from '../api/conversations.js';
+import Container from './Container.jsx';
 
 const navLink = ({ isActive }) =>
   `whitespace-nowrap border-b-2 px-0.5 py-1 text-[15px] ${
@@ -48,7 +49,7 @@ export default function Navbar() {
 
   return (
     <header className="bg-brand">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 md:gap-6">
+      <Container className="flex h-16 items-center gap-3 md:gap-6">
         <Link
           to="/"
           className="whitespace-nowrap text-lg font-semibold text-white md:mr-2 md:text-xl"
@@ -100,11 +101,11 @@ export default function Navbar() {
             <NavLink to="/signup" className={navLink}>Sign up</NavLink>
           </div>
         )}
-      </div>
+      </Container>
 
       {user && menuOpen && (
         <nav id="mobile-menu" className="border-t border-white/15 md:hidden">
-          <div className="mx-auto max-w-6xl px-4 pb-2">
+            <Container className="pb-2">
             <NavLink to="/messages" className={menuLink}>
               Messages
               <UnreadBadge count={unread} />
@@ -114,7 +115,7 @@ export default function Navbar() {
             <button onClick={handleLogout} className="py-3 text-[15px] text-white">
               Log out
             </button>
-          </div>
+          </Container>
         </nav>
       )}
     </header>

@@ -1,6 +1,6 @@
 import { api } from './client.js';
 
-export const PAGE_SIZE = 12;
+export const PAGE_SIZE = 24;
 
 export function browseListings({ q, category, minPrice, maxPrice, page }) {
   const params = new URLSearchParams({ limit: PAGE_SIZE });

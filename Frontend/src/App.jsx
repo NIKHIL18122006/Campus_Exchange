@@ -12,6 +12,7 @@ import MyListings from './pages/MyListings.jsx';
 import Messages from './pages/Messages.jsx';
 import Chat from './pages/Chat.jsx';
 import LiveUpdates from './components/LiveUpdates.jsx';
+import Container from './components/Container.jsx';
 
 function Shell({ children }) {
   return (
@@ -27,8 +28,10 @@ function Shell({ children }) {
 function PageLayout() {
   return (
     <Shell>
-      <main className="mx-auto max-w-6xl px-4 py-6">
-        <Outlet />
+      <main>
+        <Container className="py-6 sm:py-8">
+          <Outlet />
+        </Container>
       </main>
     </Shell>
   );
